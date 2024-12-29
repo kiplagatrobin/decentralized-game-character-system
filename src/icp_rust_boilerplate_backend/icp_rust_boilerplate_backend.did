@@ -1,0 +1,73 @@
+type Character = record {
+  id : nat64;
+  training_history : vec TrainingSession;
+  owner : text;
+  equipment : Equipment;
+  class : CharacterClass;
+  name : text;
+  level : nat32;
+  experience : nat64;
+  stats : Stats;
+  last_training : nat64;
+  skills : vec Skill;
+  creation_date : nat64;
+};
+type CharacterClass = variant { Mage; Cleric; Rogue; Warrior; Ranger };
+type CreateCharacterPayload = record { class : CharacterClass; name : text };
+type Element = variant { Air; Light; Dark; Fire; Water; Earth };
+type Equipment = record {
+  accessory : opt Item;
+  armor : opt Item;
+  weapon : opt Item;
+};
+type Item = record {
+  id : nat32;
+  required_level : nat32;
+  stat_bonus : Stats;
+  name : text;
+  rarity : Rarity;
+};
+type ListCharacterPayload = record { character_id : nat64; price : nat64 };
+type ListingStatus = variant { Sold; Active; Cancelled };
+type MarketListing = record {
+  id : nat64;
+  status : ListingStatus;
+  listing_date : nat64;
+  character_id : nat64;
+  seller : text;
+  price : nat64;
+};
+type PurchaseCharacterPayload = record { listing_id : nat64 };
+type Rarity = variant { Epic; Rare; Uncommon; Legendary; Common };
+type Result = variant { Ok : Character; Err : text };
+type Result_1 = variant { Ok : MarketListing; Err : text };
+type Skill = record {
+  id : nat32;
+  element : Element;
+  damage : nat32;
+  name : text;
+  mastery_level : nat32;
+  cooldown : nat32;
+};
+type Stat = variant { Luck; Strength; Agility; Intelligence; Vitality };
+type Stats = record {
+  luck : nat32;
+  strength : nat32;
+  agility : nat32;
+  intelligence : nat32;
+  vitality : nat32;
+};
+type TrainCharacterPayload = record { character_id : nat64; stat : Stat };
+type TrainingSession = record {
+  stat_trained : Stat;
+  gain : nat32;
+  timestamp : nat64;
+};
+service : {
+  create_character : (CreateCharacterPayload) -> (Result);
+  get_character : (nat64) -> (Result) query;
+  get_market_listings : () -> (vec MarketListing) query;
+  list_character : (ListCharacterPayload) -> (Result_1);
+  purchase_character : (PurchaseCharacterPayload) -> (Result);
+  train_character : (TrainCharacterPayload) -> (Result);
+}
